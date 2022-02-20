@@ -1,11 +1,12 @@
 package br.com.viceri.todolist.repository;
 
 import br.com.viceri.todolist.entity.User;
-import org.springframework.stereotype.Component;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-@Component
-public class UserRepository {
-    public User add(User user){
-        return user;
-    };
+import java.util.UUID;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
+
 }
