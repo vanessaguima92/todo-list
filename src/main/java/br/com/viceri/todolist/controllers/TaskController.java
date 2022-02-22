@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
@@ -19,19 +20,25 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAll(){
+    public ResponseEntity<List<Task>> getAll() {
         return ResponseEntity.ok(this.taskService.getAll());
     }
 
     @PostMapping
-    public ResponseEntity<TaskDTO> create(@RequestBody CreateTaskDTO createTaskDTO){
-        try{
+    public ResponseEntity<TaskDTO> create(@RequestBody CreateTaskDTO createTaskDTO) {
+        try {
             TaskDTO taskDTO = this.taskService.create(createTaskDTO);
             return ResponseEntity.ok(taskDTO);
-        }
-        catch(UserNotFoundException ex){
+        } catch (UserNotFoundException ex) {
             System.out.println(String.format("Error while inserting a new task. Error: %s", ex.getLocalizedMessage()));
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @DeleteMapping
+    @RequestMapping("{id}")
+    public ResponseEntity<TaskDTO> delete(@PathVariable("id") String id) {
+        this.taskService.delete(id);
+        return ResponseEntity.ok().body(null);
     }
 }

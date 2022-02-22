@@ -26,11 +26,7 @@ public class TaskService {
     }
 
     public TaskDTO create(CreateTaskDTO createTaskDTO) throws UserNotFoundException {
-        Optional<User> user = this.userRepository.findById(UUID.fromString(createTaskDTO.getIdUsuario()));
-
-        if(user.isEmpty()){
-            throw new UserNotFoundException();
-        }
+        Optional<User> user = getUser(createTaskDTO.getIdUsuario());
         var task = new Task();
 
         task.setDescription(createTaskDTO.getDescription());
@@ -41,5 +37,18 @@ public class TaskService {
         this.taskRepository.save(task);
 
         return new TaskDTO(task.getDescription(), task.getPriority());
+    }
+
+    public void delete(String id) {
+        this.taskRepository.deleteById(UUID.fromString(id));
+    }
+
+    private Optional<User> getUser(String id) throws UserNotFoundException {
+        Optional<User> user = this.userRepository.findById(UUID.fromString(id));
+
+        if(user.isEmpty()){
+            throw new UserNotFoundException();
+        }
+        return user;
     }
 }
