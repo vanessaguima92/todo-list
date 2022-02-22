@@ -36,12 +36,7 @@ public class TaskService {
         task.setDescription(createTaskDTO.getDescription());
         task.setPriority(createTaskDTO.getPriority());
 
-        User userToUpdate = user.get();
-        userToUpdate.getTasks().add(task);
-
-        User updatedUser = this.userRepository.save(userToUpdate);
-
-        task.setUser(updatedUser);
+        task.setUser(user.get());
 
         this.taskRepository.save(task);
 

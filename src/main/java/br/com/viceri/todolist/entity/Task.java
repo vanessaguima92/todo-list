@@ -2,6 +2,7 @@ package br.com.viceri.todolist.entity;
 
 import br.com.viceri.todolist.types.PriorityEnum;
 import br.com.viceri.todolist.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -17,8 +18,9 @@ public class Task {
     @GenericGenerator(name="UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = Task.class, optional = false)
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
+    @JsonIgnore()
     private User user;
 
     @Column(nullable = false)
