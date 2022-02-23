@@ -1,7 +1,6 @@
 package br.com.viceri.todolist.entity;
 
 import br.com.viceri.todolist.types.PriorityEnum;
-import br.com.viceri.todolist.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -29,4 +28,7 @@ public class Task {
     @Column(nullable = false)
     @Enumerated
     private PriorityEnum priority;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean done;
 }

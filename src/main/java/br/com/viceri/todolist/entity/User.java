@@ -1,6 +1,7 @@
 package br.com.viceri.todolist.entity;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class User {
     @Column(nullable = false, unique = true, updatable = false)
     private String email;
 
+    @JsonIgnore()
     @Column(nullable = false)
     private String password;
 
