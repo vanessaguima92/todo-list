@@ -4,7 +4,6 @@ import br.com.viceri.todolist.dto.CreateTaskDTO;
 import br.com.viceri.todolist.dto.HttpExceptionCustomResponseDTO;
 import br.com.viceri.todolist.dto.PartialUpdateTaskDTO;
 import br.com.viceri.todolist.entity.Task;
-import br.com.viceri.todolist.entity.User;
 import br.com.viceri.todolist.exceptions.TaskNotFoundException;
 import br.com.viceri.todolist.exceptions.TaskPermissionException;
 import br.com.viceri.todolist.exceptions.UserNotFoundException;
@@ -44,7 +43,7 @@ public class TaskController {
                     content = @Content(schema = @Schema(hidden = true)))
     })
     @GetMapping
-    public ResponseEntity<List<Task>> getAll(@RequestHeader("Authorization") String token, @RequestParam(value = "priority", required = false) PriorityEnum priorityFilter) {
+    public ResponseEntity<List<Task>> getAll(@RequestHeader(value = "Authorization", required = false) String token, @RequestParam(value = "priority", required = false) PriorityEnum priorityFilter) {
         final UUID userId = UUID.fromString(this.jwtTokenUtil.getClaimValueFromToken(token, "userId"));
 
         if(nonNull(priorityFilter)){
@@ -61,7 +60,7 @@ public class TaskController {
                     content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping
-    public ResponseEntity<Task> create(@RequestHeader("Authorization") String token, @RequestBody CreateTaskDTO createTaskDTO) {
+    public ResponseEntity<Task> create(@RequestHeader(value = "Authorization", required = false) String token, @RequestBody CreateTaskDTO createTaskDTO) {
         try {
             final UUID userId = UUID.fromString(this.jwtTokenUtil.getClaimValueFromToken(token, "userId"));
             Task task = this.taskService.create(createTaskDTO, userId);
@@ -79,7 +78,7 @@ public class TaskController {
                     content = @Content(schema = @Schema(hidden = true)))
     })
     @DeleteMapping("{id}")
-    public ResponseEntity<?> delete(@RequestHeader("Authorization") String token, @PathVariable("id") String id) {
+    public ResponseEntity<?> delete(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("id") String id) {
         try {
             final UUID userId = UUID.fromString(this.jwtTokenUtil.getClaimValueFromToken(token, "userId"));
             this.taskService.delete(id, userId);
@@ -100,7 +99,7 @@ public class TaskController {
                     content = @Content(schema = @Schema(hidden = true)))
     })
     @PatchMapping("{id}")
-    public ResponseEntity<?> partialUpdate(@RequestHeader("Authorization") String token, @RequestBody PartialUpdateTaskDTO partialUpdate, @PathVariable("id") String id) {
+    public ResponseEntity<?> partialUpdate(@RequestHeader(value = "Authorization", required = false) String token, @RequestBody PartialUpdateTaskDTO partialUpdate, @PathVariable("id") String id) {
         try {
             final UUID userId = UUID.fromString(this.jwtTokenUtil.getClaimValueFromToken(token, "userId"));
             Task task = this.taskService.partialUpdate(partialUpdate, id, userId);
@@ -121,7 +120,7 @@ public class TaskController {
                     content = @Content(schema = @Schema(hidden = true)))
     })
     @PutMapping("{id}/done")
-    public ResponseEntity done(@RequestHeader("Authorization") String token, @PathVariable("id") String id) {
+    public ResponseEntity done(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable("id") String id) {
         try{
             final UUID userId = UUID.fromString(this.jwtTokenUtil.getClaimValueFromToken(token, "userId"));
             final Task task = this.taskService.setTaskDone(id, userId);
