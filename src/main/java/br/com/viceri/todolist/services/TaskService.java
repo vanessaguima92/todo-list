@@ -1,9 +1,11 @@
 package br.com.viceri.todolist.services;
 
 import br.com.viceri.todolist.dto.CreateTaskDTO;
-import br.com.viceri.todolist.dto.TaskDTO;
+import br.com.viceri.todolist.dto.PartialUpdateTaskDTO;
 import br.com.viceri.todolist.entity.Task;
 import br.com.viceri.todolist.entity.User;
+import br.com.viceri.todolist.exceptions.TaskNotFoundException;
+import br.com.viceri.todolist.exceptions.TaskPermissionException;
 import br.com.viceri.todolist.exceptions.UserNotFoundException;
 import br.com.viceri.todolist.repository.TaskRepository;
 import br.com.viceri.todolist.repository.UserRepository;
@@ -25,8 +27,8 @@ public class TaskService {
         return this.taskRepository.findAll();
     }
 
-    public TaskDTO create(CreateTaskDTO createTaskDTO) throws UserNotFoundException {
-        Optional<User> user = getUser(createTaskDTO.getIdUsuario());
+    public Task create(CreateTaskDTO createTaskDTO, UUID userId) throws UserNotFoundException {
+        Optional<User> user = getUser(userId);
         var task = new Task();
 
         task.setDescription(createTaskDTO.getDescription());
@@ -34,21 +36,60 @@ public class TaskService {
 
         task.setUser(user.get());
 
-        this.taskRepository.save(task);
-
-        return new TaskDTO(task.getDescription(), task.getPriority());
+        final Task savedTask = this.taskRepository.save(task);
+        return savedTask;
     }
 
-    public void delete(String id) {
+    public void delete(String id, UUID userId) throws TaskNotFoundException, TaskPermissionException {
+        final Optional<Task> task = this.taskRepository.findById(UUID.fromString(id));
+
+        if(task.isEmpty()){
+            throw new TaskNotFoundException();
+        }
+
+        if(!task.get().getUser().getId().equals(userId)){
+            throw new TaskPermissionException();
+        }
+
         this.taskRepository.deleteById(UUID.fromString(id));
     }
 
-    private Optional<User> getUser(String id) throws UserNotFoundException {
-        Optional<User> user = this.userRepository.findById(UUID.fromString(id));
+    private Optional<User> getUser(UUID id) throws UserNotFoundException {
+        Optional<User> user = this.userRepository.findById(id);
 
         if(user.isEmpty()){
             throw new UserNotFoundException();
         }
         return user;
+    }
+
+    public Task setTaskDone(String id, UUID userId) throws TaskNotFoundException, TaskPermissionException {
+        final Task taskToUpdate = getTask(id, userId);
+        taskToUpdate.setDone(true);
+        final Task savedTask = this.taskRepository.save(taskToUpdate);
+        return savedTask;
+    }
+
+    public Task partialUpdate(PartialUpdateTaskDTO partialUpdate, String id, UUID userId) throws TaskNotFoundException, TaskPermissionException {
+        final Task taskToUpdate = getTask(id, userId);
+        taskToUpdate.setDescription(partialUpdate.getDescription());
+        taskToUpdate.setPriority(partialUpdate.getPriority());
+
+        final Task savedTask = this.taskRepository.save(taskToUpdate);
+        return savedTask;
+    }
+
+    private Task getTask(String id, UUID userId) throws TaskNotFoundException, TaskPermissionException {
+        final Optional<Task> task = this.taskRepository.findById(UUID.fromString(id));
+
+        if (task.isEmpty()) {
+            throw new TaskNotFoundException();
+        }
+
+        if (!task.get().getUser().getId().equals(userId)) {
+            throw new TaskPermissionException();
+        }
+
+        return task.get();
     }
 }

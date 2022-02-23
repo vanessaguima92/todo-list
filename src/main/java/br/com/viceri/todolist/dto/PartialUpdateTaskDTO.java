@@ -1,13 +1,14 @@
 package br.com.viceri.todolist.dto;
 
 import br.com.viceri.todolist.types.PriorityEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-public class TaskDTO {
+@Getter
+@Setter
+@RequiredArgsConstructor
+public class PartialUpdateTaskDTO {
     private String description;
     private PriorityEnum priority;
 }

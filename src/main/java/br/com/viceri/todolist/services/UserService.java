@@ -1,31 +1,39 @@
 package br.com.viceri.todolist.services;
 
 import br.com.viceri.todolist.dto.CreateUserDTO;
-import br.com.viceri.todolist.dto.UserDTO;
 import br.com.viceri.todolist.entity.User;
 import br.com.viceri.todolist.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
-    public UserDTO create(CreateUserDTO newUser){
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public User create(CreateUserDTO newUser){
         User user = new User();
         user.setName(newUser.getName());
         user.setEmail(newUser.getEmail());
-        user.setPassword(newUser.getPassword());
+        user.setPassword(passwordEncoder.encode(newUser.getPassword()));
 
-        this.userRepository.save(user);
+        final User savedUser = this.userRepository.save(user);
 
-        return new UserDTO(newUser.getName(), newUser.getEmail());
+        return savedUser;
     };
 
     public List<User> getAll() {
         return this.userRepository.findAll();
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return this.userRepository.findByEmail(email);
     }
 }
